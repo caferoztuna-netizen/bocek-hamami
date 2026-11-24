@@ -218,6 +218,15 @@
             animation: discoGlow 1.2s linear infinite;
         }
 
+        /* Boş hamam davet kutusu: hafifçe nefes alır */
+        @keyframes invitePulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(251, 191, 36, 0); }
+            50% { transform: scale(1.04); box-shadow: 0 0 22px rgba(251, 191, 36, 0.45); }
+        }
+        .invite-pulse {
+            animation: invitePulse 2.2s ease-in-out infinite;
+        }
+
         /* Hediye Bildirim Balonu */
         #gift-toast {
             transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
@@ -337,7 +346,7 @@
                     <div class="text-stone-100 whitespace-nowrap">
                         <span class="font-bold text-white">OTUR</span> katıl ·
                         <span class="font-bold text-white">YIKAN</span> su dök ·
-                        <span class="font-bold text-white">RENK</span> peştemal rengini değiştir
+                        <span class="font-bold text-white">RENK</span> peştamal rengini değiştir
                     </div>
                     <div class="text-stone-100 flex items-center gap-1.5 mt-0.5">
                         <span class="text-amber-300 font-semibold">Hamam Ağası:</span>
@@ -363,6 +372,17 @@
                 <div class="disco-active-pill px-3.5 py-1.5 rounded-full bg-black/75 border-2 text-white text-xs font-extrabold tracking-wide flex items-center gap-2 backdrop-blur-md whitespace-nowrap">
                     <span class="text-fuchsia-300">HAMAM DİSKOSU</span>
                     <span id="disco-timer" class="px-2 py-0.5 rounded-full bg-white/15 text-yellow-300 font-mono">15 sn</span>
+                </div>
+            </div>
+
+            <!-- BOŞ HAMAM DAVETİ (hamamda kimse yokken görünür) -->
+            <div id="empty-invite" class="hidden absolute top-[44%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none w-[82%]">
+                <div class="invite-pulse hud-box px-4 py-3 text-center bg-stone-950/55 border-amber-300/50">
+                    <div class="text-[15px] font-extrabold text-amber-300 leading-tight">Hamam seni bekliyor!</div>
+                    <div class="mt-1.5 text-[12px] font-semibold text-white leading-snug">
+                        Sohbet'e <span class="px-1.5 py-0.5 rounded-md bg-amber-500/90 text-stone-950 font-extrabold">OTUR</span> yaz,
+                        <br>ilk hamamböceği sen ol 🛁
+                    </div>
                 </div>
             </div>
 
@@ -1299,9 +1319,13 @@
         // 6. Kubbe iç kaburgaları
         const ribGeo = new THREE.TorusGeometry(12.45, 0.07, 4, 28, Math.PI / 2);
         for (let k = 0; k < 12; k++) {
+            const theta = (k / 12) * Math.PI * 2;
+            // Kaburganın tabanı (12.45·cosθ, 6.9, -12.45·sinθ). Önü açık cephede
+            // kameranın tam önünden geçip görüntüyü böldüğü için orada kaburga yok.
+            if (-Math.sin(theta) * 12.45 > 3.5) continue;
             const rib = new THREE.Mesh(ribGeo, m.trimMat);
             rib.position.y = 6.9;
-            rib.rotation.y = (k / 12) * Math.PI * 2;
+            rib.rotation.y = theta;
             scene.add(rib);
         }
 
@@ -2841,9 +2865,19 @@
     const AVATAR_COLORS = ['#dc2626', '#0284c7', '#059669', '#9333ea', '#d97706', '#db2777', '#2563eb', '#0f766e'];
     const COLD_DRINKS = ['Gazoz', 'Ayran', 'Limonata', 'Osmanlı Şerbeti'];
 
-    function normalizeUser(rawName) {
-        const clean = String(rawName || 'Misafir').trim().replace(/^@+/, '') || 'Misafir';
-        return { key: clean.toLowerCase(), display: clean };
+    // Kullanıcı iki şekilde gelebilir:
+    //  - TikTok'tan: { id: kullanıcı adı (@uniqueId, değişmez), name: görünen ad }
+    //    → bakiye/koltuk kullanıcı adına bağlanır, ekranda görünen ad yazar
+    //  - Test panelinden/demodan: düz metin → hem anahtar hem görünen ad
+    function normalizeUser(rawUser) {
+        const clean = v => String(v || '').trim().replace(/^@+/, '');
+        if (rawUser && typeof rawUser === 'object') {
+            const id = clean(rawUser.id) || clean(rawUser.name) || 'Misafir';
+            const name = clean(rawUser.name) || id;
+            return { key: id.toLowerCase(), display: name };
+        }
+        const text = clean(rawUser) || 'Misafir';
+        return { key: text.toLowerCase(), display: text };
     }
 
     function hashColor(str) {
@@ -2943,6 +2977,7 @@
 
     function updateHudStats() {
         document.getElementById('hud-occupancy').textContent = `${guests.size} / ${SEATS.length} Kişi`;
+        document.getElementById('empty-invite').classList.toggle('hidden', guests.size > 0);
         document.getElementById('hud-aga-name').textContent = activeAga ? `@${activeAga.displayName}` : 'Boş (Çay · 50 Jeton)';
         if (activeTellak) {
             const suffix = activeTellak.isNPC ? '' : ` (${Math.ceil(activeTellak.remainingSec)}sn)`;
@@ -3417,9 +3452,14 @@
     ];
 
     function nextAutoCameraShot() {
+        autoCamTimer = 7.2;
+        // Hamam boşken boş duvarları gezmek yerine genel görünümde kal
+        if (guests.size === 0) {
+            if (desiredCam.dist < 15) setCameraPreset('overview');
+            return;
+        }
         autoCamStepIndex = (autoCamStepIndex + 1) % AUTO_CAMERA_PLAN.length;
         AUTO_CAMERA_PLAN[autoCamStepIndex]();
-        autoCamTimer = 7.2;
     }
 
     function updateCameraPosition() {
@@ -3925,7 +3965,10 @@
             const msg = JSON.parse(ev.data);
             const eventType = (msg.event || msg.type || '').toLowerCase();
             const d = msg.data || msg;
-            const user = d.nickname || d.uniqueId || d.user || 'İzleyici';
+            const user = {
+                id: d.uniqueId || d.userId || d.nickname || d.user || 'İzleyici',
+                name: d.nickname || d.uniqueId || d.user || 'İzleyici'
+            };
             const avatar = d.profilePictureUrl || d.avatar || null;
 
             if (eventType === 'chat' || d.comment) {
