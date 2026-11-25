@@ -3362,7 +3362,7 @@
         if (isManual) autoCamManualPause = 12.0;
 
         if (preset === 'overview') {
-            desiredCam = { yaw: 0.0, pitch: 0.42, dist: 15.6, look: new THREE.Vector3(0, 1.45, -0.8), orbitSpeed: 0.0, swayCenter: 0.0, swayAmp: 0.36, swayFreq: 0.18 };
+            desiredCam = { preset: 'overview', yaw: 0.0, pitch: 0.42, dist: 15.6, look: new THREE.Vector3(0, 1.45, -0.8), orbitSpeed: 0.0, swayCenter: 0.0, swayAmp: 0.36, swayFreq: 0.18 };
             updateCameraLabel('Genel Panorama');
         } else if (preset === 'gobek') {
             const randYaw = (Math.random() - 0.5) * 2.2;
@@ -3455,7 +3455,8 @@
         autoCamTimer = 7.2;
         // Hamam boşken boş duvarları gezmek yerine genel görünümde kal
         if (guests.size === 0) {
-            if (desiredCam.dist < 15) setCameraPreset('overview');
+            // Açılıştaki dönen kamera ayarında kalmasın: hep salınan genel görünüm
+            if (desiredCam.preset !== 'overview') setCameraPreset('overview');
             return;
         }
         autoCamStepIndex = (autoCamStepIndex + 1) % AUTO_CAMERA_PLAN.length;
@@ -4092,6 +4093,7 @@
             refreshAllGiftIcons();
             initThreeScene();
             initDefaultTellak();
+            setCameraPreset('overview');
             handleResize();
             startDemoLoop();
             animate();
