@@ -2,7 +2,14 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <!-- iPhone'da "Ana Ekrana Ekle" ile Safari çubukları olmadan tam ekran açılsın -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Böcek Hamamı">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="assets/icon-180.png">
     <title>Böcek Hamamı — 3D TikTok LIVE Oyunu</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -250,6 +257,8 @@
         body.yayin-modu {
             padding: 0 !important;
             overflow: hidden;
+            overscroll-behavior: none;
+            touch-action: none;
             background: #000;
             display: block;
         }
@@ -267,7 +276,7 @@
             left: var(--yayin-left, 0px);
             top: var(--yayin-top, 0px);
             width: 432px;
-            height: 768px;
+            height: var(--yayin-h, 768px);
             max-width: none;
             max-height: none;
             aspect-ratio: auto;
@@ -283,6 +292,19 @@
         body.yayin-modu #safe-zone span {
             display: none;
         }
+        /* Telefonda ilk dokunuş ekranı (ses ve ekranın açık kalması için gerekli) */
+        #tap-start {
+            position: fixed; inset: 0; z-index: 200;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+            background: radial-gradient(circle at 50% 40%, #3a2a1f 0%, #120d0a 75%);
+            color: #fde68a; font-weight: 800; text-align: center;
+        }
+        #tap-start .ring {
+            width: 120px; height: 120px; border-radius: 999px; border: 4px solid #fbbf24;
+            display: flex; align-items: center; justify-content: center; font-size: 54px;
+            animation: tapPulse 1.6s ease-in-out infinite;
+        }
+        @keyframes tapPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
     </style>
 </head>
 <body class="flex flex-col items-center justify-between p-2 sm:p-3 gap-2">
@@ -546,9 +568,12 @@
     const URL_PARAMS = new URLSearchParams(location.search);
     const YAYIN_MODU = URL_PARAMS.get('yayin') === '1';
     const DEMO_ZORLA = URL_PARAMS.get('demo') === '1';
-    const DEFAULT_WS_URL = URL_PARAMS.get('ws') || 'ws://localhost:21213/';
+    // Ev ağı adresinden (yayın istasyonundan) açıldıysa TikFinity aktarıcısı aynı bilgisayarda 21214'te
+    const ON_LAN = /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(location.hostname);
+    const DEFAULT_WS_URL = URL_PARAMS.get('ws') || (ON_LAN ? `ws://${location.hostname}:21214/` : 'ws://localhost:21213/');
+    const IS_TOUCH = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
     const STAGE_W = 432;
-    const STAGE_H = 768;
+    let stageH = 768; // yayın modunda ekran oranına göre uzar (telefon ekranı daha uzun)
 
     const TIKTOK_CDN = 'https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/';
     const GIFT_CONFIG = {
@@ -4032,18 +4057,56 @@
         else connectWebSocket();
     }
 
+    function readSafeInsets() {
+        const probe = document.createElement('div');
+        probe.style.cssText = 'position:fixed;top:0;left:0;visibility:hidden;pointer-events:none;' +
+            'padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);';
+        document.body.appendChild(probe);
+        const cs = getComputedStyle(probe);
+        const r = { top: parseFloat(cs.paddingTop) || 0, bottom: parseFloat(cs.paddingBottom) || 0 };
+        probe.remove();
+        return r;
+    }
+
+    // Telefonda: ses için bir dokunuş + yayın boyunca ekranın kararmaması
+    let wakeLock = null;
+    async function keepScreenOn() {
+        try { if (navigator.wakeLock) wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
+    }
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && wakeLock !== null) keepScreenOn();
+    });
+    function showTapToStart() {
+        const el = document.createElement('div');
+        el.id = 'tap-start';
+        el.innerHTML = '<div class="ring">🛁</div><div style="font-size:26px">Böcek Hamamı</div>' +
+            '<div style="font-size:15px;color:#e7d3b4;font-weight:600">Başlatmak için ekrana dokun</div>';
+        el.addEventListener('click', () => {
+            ensureAudioCtx();
+            keepScreenOn();
+            el.remove();
+        }, { once: true });
+        document.body.appendChild(el);
+    }
+
     function handleResize() {
         const container = document.getElementById('stream-stage');
         if (!container || !renderer || !camera) return;
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         if (YAYIN_MODU) {
-            // Sahneyi pencereye sığdır (OBS'de 1080x1920 → 2.5 kat) ve ortala
-            const scale = Math.min(window.innerWidth / STAGE_W, window.innerHeight / STAGE_H);
+            // Sahneyi pencereye sığdır (OBS'de 1080x1920 → 2.5 kat). Telefonda saat/çentik
+            // alanını atla ve sahneyi ekranın uzunluğuna göre uzat ki siyah boşluk kalmasın.
+            const ins = readSafeInsets();
+            const availW = window.innerWidth, availH = window.innerHeight - ins.top - ins.bottom;
+            stageH = Math.max(768, Math.round(STAGE_W * availH / availW));
+            const scale = Math.min(availW / STAGE_W, availH / stageH);
             const rootStyle = document.documentElement.style;
             rootStyle.setProperty('--yayin-scale', scale.toFixed(4));
-            rootStyle.setProperty('--yayin-left', `${((window.innerWidth - STAGE_W * scale) / 2).toFixed(1)}px`);
-            rootStyle.setProperty('--yayin-top', `${((window.innerHeight - STAGE_H * scale) / 2).toFixed(1)}px`);
-            renderer.setPixelRatio(Math.min(scale * dpr, 4));
+            rootStyle.setProperty('--yayin-h', `${stageH}px`);
+            rootStyle.setProperty('--yayin-left', `${((availW - STAGE_W * scale) / 2).toFixed(1)}px`);
+            rootStyle.setProperty('--yayin-top', `${(ins.top + (availH - stageH * scale) / 2).toFixed(1)}px`);
+            const devDpr = Math.min(window.devicePixelRatio || 1, 3);
+            renderer.setPixelRatio(Math.min(scale * devDpr, 2.5));
         } else {
             renderer.setPixelRatio(dpr);
         }
@@ -4079,6 +4142,7 @@
     }
 
     window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', () => setTimeout(handleResize, 300));
 
     window.onload = function() {
         try {
@@ -4098,6 +4162,7 @@
             startDemoLoop();
             animate();
             if (YAYIN_MODU) connectWebSocket();
+            if (YAYIN_MODU && IS_TOUCH) showTapToStart();
         } catch (err) {
             console.error('Hamam 3D başlatma hatası:', err);
         }
