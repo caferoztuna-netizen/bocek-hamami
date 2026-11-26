@@ -227,25 +227,21 @@
             animation: invitePulse 2.2s ease-in-out infinite;
         }
 
-        /* Sağ kenar hediye listesi: kutusuz, küçük, sessiz. Sayı ikonun alt yarısını kapatır. */
-        .gift-row {
-            display: flex; align-items: center; justify-content: flex-end; gap: 4px;
-            opacity: 0.82;
+        /* Sağ kenar hediye listesi: küçük, sessiz. Ne işe yaradığı küçük harflerle
+           ikonun üstüne yazılır; ikonun sadece üst ucu görünür. */
+        .gift-tile {
+            position: relative; width: 44px; height: 34px; opacity: 0.85;
         }
-        .gift-row .gc-label {
-            font-size: 9.5px; font-weight: 700; color: rgba(255, 255, 255, 0.85); line-height: 1.1;
-            white-space: nowrap; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
-        }
-        .gift-mini { position: relative; flex-shrink: 0; width: 26px; height: 26px; }
-        .gift-mini .gift-icon-wrap { width: 26px; height: 26px; }
-        .gift-mini .gift-icon-wrap img, .gift-mini .gift-icon-wrap svg {
-            width: 24px; height: 24px;
+        .gift-tile .gift-icon-wrap { width: 44px; height: 34px; }
+        .gift-tile .gift-icon-wrap img, .gift-tile .gift-icon-wrap svg {
+            width: 32px; height: 32px;
             filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
         }
-        .gift-mini-num {
-            position: absolute; left: 50%; bottom: -1px; transform: translateX(-50%);
-            font-size: 12px; font-weight: 900; line-height: 1; color: #fde68a;
-            -webkit-text-stroke: 2.5px #1c120a; paint-order: stroke fill;
+        .gift-tile-txt {
+            position: absolute; left: 0; right: 0; bottom: 0; height: 68%;
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            border-radius: 6px; background: rgba(22, 15, 10, 0.72);
+            font-size: 8.5px; font-weight: 700; line-height: 1.05; color: #fff7e6;
         }
 
         /* Ortadaki bildirimler yaylanarak belirir */
@@ -392,28 +388,13 @@
                 <div id="hud-feed" class="hud-box-soft px-2 py-1 flex flex-col gap-0.5 text-[10.5px] leading-tight"></div>
             </div>
 
-            <!-- SAĞ KENAR: küçük, kutusuz hediye listesi (sayı ikonun üstünde) -->
-            <div class="absolute top-[92px] right-1.5 z-20 pointer-events-none flex flex-col gap-1">
-                <div class="gift-row">
-                    <span class="gc-label">Soğuk İçecek</span>
-                    <div class="gift-mini"><div class="gift-icon-wrap" data-gift-slot="rose"></div><span class="gift-mini-num">1</span></div>
-                </div>
-                <div class="gift-row">
-                    <span class="gc-label">Köpüklü Kese</span>
-                    <div class="gift-mini"><div class="gift-icon-wrap" data-gift-slot="nazar"></div><span class="gift-mini-num">5</span></div>
-                </div>
-                <div class="gift-row">
-                    <span class="gc-label">Disko 15 sn</span>
-                    <div class="gift-mini"><div class="gift-icon-wrap" data-gift-slot="rosa"></div><span class="gift-mini-num">10</span></div>
-                </div>
-                <div class="gift-row">
-                    <span class="gc-label">Tellak Ol</span>
-                    <div class="gift-mini"><div class="gift-icon-wrap" data-gift-slot="perfume"></div><span class="gift-mini-num">20</span></div>
-                </div>
-                <div class="gift-row">
-                    <span class="gc-label">Hamam Ağası</span>
-                    <div class="gift-mini"><div class="gift-icon-wrap" data-gift-slot="tea"></div><span class="gift-mini-num">50</span></div>
-                </div>
+            <!-- SAĞ KENAR: küçük hediye listesi (etkisi ikonun üstünde, ikonun ucu görünür) -->
+            <div class="absolute top-[92px] right-1.5 z-20 pointer-events-none flex flex-col gap-1.5">
+                <div class="gift-tile"><div class="gift-icon-wrap" data-gift-slot="rose"></div><span class="gift-tile-txt">soğuk<br>içecek</span></div>
+                <div class="gift-tile"><div class="gift-icon-wrap" data-gift-slot="nazar"></div><span class="gift-tile-txt">köpüklü<br>kese</span></div>
+                <div class="gift-tile"><div class="gift-icon-wrap" data-gift-slot="rosa"></div><span class="gift-tile-txt">disko<br>15 sn</span></div>
+                <div class="gift-tile"><div class="gift-icon-wrap" data-gift-slot="perfume"></div><span class="gift-tile-txt">tellak<br>ol</span></div>
+                <div class="gift-tile"><div class="gift-icon-wrap" data-gift-slot="tea"></div><span class="gift-tile-txt">hamam<br>ağası</span></div>
             </div>
 
             <!-- ORTA: GEÇİCİ BİLDİRİMLER (disko, hoş geldin, hediye, davet) — sohbet alanının üstünde -->
@@ -3079,7 +3060,7 @@
     let welcomeBusyUntil = 0;
     function handleMemberJoin(rawUser, avatarUrl) {
         const { key, display } = normalizeUser(rawUser);
-        if (guests.has(key)) return;
+        if (guests.has(key)) { guests.get(key).lastActive = Date.now(); return; }
         welcomeQueue.push({ display, avatarUrl });
         if (welcomeQueue.length > 3) welcomeQueue.splice(0, welcomeQueue.length - 3); // kalabalıkta son gelenler
     }
@@ -4206,9 +4187,30 @@
                 handleIncomingGiftEvent(d, user, avatar);
             } else if (eventType === 'member') {
                 handleMemberJoin(user, avatar);
+            } else if (eventType === 'like' || eventType === 'social') {
+                markGuestActive(user);
             }
         } catch (err) {}
     }
+
+    /* Ayrılan izleyiciler: TikTok "ayrıldı" bilgisi göndermez. Oturan biri 3 dakika boyunca
+       hiç sohbet/hediye/beğeni/giriş olayı üretmezse yayından ayrılmış sayılır ve kalkar. */
+    const GUEST_IDLE_MS = 3 * 60 * 1000;
+    function markGuestActive(rawUser) {
+        const g = guests.get(normalizeUser(rawUser).key);
+        if (g) g.lastActive = Date.now();
+    }
+    function sweepIdleGuests() {
+        const now = Date.now();
+        for (const [key, g] of Array.from(guests.entries())) {
+            if (now - g.lastActive > GUEST_IDLE_MS) {
+                const name = g.displayName;
+                removeGuest(key);
+                pushFeedItem(name, 'Hamamdan ayrıldı');
+            }
+        }
+    }
+    setInterval(sweepIdleGuests, 5000);
 
     function scheduleReconnect() {
         clearTimeout(wsRetryTimer);
