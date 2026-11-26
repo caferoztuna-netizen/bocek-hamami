@@ -357,34 +357,34 @@
                 Paneli Aç
             </button>
 
-            <!-- SOL ÜST: DURUM & KOMUT KUTUSU (TikTok'un üst çubuğunun altında başlar) -->
-            <div class="absolute top-[90px] left-2.5 z-20 pointer-events-none flex flex-col gap-1.5 w-[262px]">
-                <div class="hud-box px-3 py-2 leading-snug">
-                    <div class="flex items-center justify-between border-b border-white/15 pb-1 mb-1.5">
-                        <span class="text-[15px] font-extrabold text-amber-300 tracking-tight">BÖCEK HAMAMI</span>
-                        <span id="hud-occupancy" class="text-[13px] font-extrabold text-white bg-black/30 px-2 py-0.5 rounded-md">0/30</span>
+            <!-- SOL ÜST: DURUM & KOMUT KUTUSU (sıkı; TikTok'un üst çubuğunun altında başlar) -->
+            <div class="absolute top-[90px] left-2.5 z-20 pointer-events-none flex flex-col gap-1 w-[206px]">
+                <div class="hud-box px-2 py-1.5 leading-tight">
+                    <div class="flex items-center justify-between border-b border-white/15 pb-0.5 mb-1">
+                        <span class="text-[12px] font-extrabold text-amber-300 tracking-tight">BÖCEK HAMAMI</span>
+                        <span id="hud-occupancy" class="text-[11px] font-extrabold text-white bg-black/30 px-1.5 rounded">0/30</span>
                     </div>
-                    <div id="hud-full" class="hidden mb-1.5 px-2 py-1 rounded-lg bg-rose-600/85 text-white text-[12.5px] font-extrabold leading-tight">
-                        Hamam DOLU! Oturmak için en az <span id="hud-min-coins">1</span> jeton
+                    <div id="hud-full" class="hidden mb-1 px-1.5 py-0.5 rounded-md bg-rose-600/85 text-white text-[10.5px] font-extrabold leading-tight">
+                        DOLU! Oturmak için en az <span id="hud-min-coins">1</span> jeton
                     </div>
-                    <div class="text-[12.5px] font-extrabold text-sky-300 mb-0.5">Sohbete yaz:</div>
-                    <div class="grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-0.5 text-[13.5px]">
-                        <span class="font-extrabold text-amber-300">OTUR</span><span class="font-semibold text-white">hamama gir</span>
-                        <span class="font-extrabold text-amber-300">YIKAN</span><span class="font-semibold text-white">su dök</span>
-                        <span class="font-extrabold text-amber-300">RENK</span><span class="font-semibold text-white">peştamal rengi</span>
+                    <div class="text-[11px] leading-snug text-white">
+                        <span class="font-extrabold text-sky-300">Yaz:</span>
+                        <span class="font-extrabold text-amber-300">OTUR</span> gir ·
+                        <span class="font-extrabold text-amber-300">YIKAN</span> su dök ·
+                        <span class="font-extrabold text-amber-300">RENK</span> peştamal
                     </div>
-                    <div class="mt-1.5 pt-1.5 border-t border-white/15 text-[12.5px] space-y-0.5">
+                    <div class="mt-1 pt-1 border-t border-white/15 text-[10.5px] space-y-px">
                         <div class="truncate"><span class="text-amber-300 font-extrabold">Ağa:</span> <span id="hud-aga-name" class="font-bold text-yellow-200">Boş</span></div>
                         <div class="flex items-center justify-between gap-1">
                             <span class="truncate"><span class="text-pink-300 font-extrabold">Tellak:</span> <span id="hud-tellak-name" class="font-bold text-pink-100">Hasan</span></span>
-                            <span id="hud-tellak-queue" class="text-[11px] font-bold text-white bg-black/30 px-1.5 py-0.5 rounded shrink-0">Sıra: 0</span>
+                            <span id="hud-tellak-queue" class="text-[10px] font-bold text-white bg-black/30 px-1 rounded shrink-0">Sıra: 0</span>
                         </div>
-                        <div id="hud-spectators" class="hidden text-stone-100"><span class="font-extrabold">İzleyici:</span> <span id="hud-spectator-count" class="font-bold">0</span> kişi sırada</div>
+                        <div id="hud-spectators" class="hidden text-stone-100"><span class="font-extrabold">İzleyici:</span> <span id="hud-spectator-count" class="font-bold">0</span> sırada</div>
                     </div>
                 </div>
 
-                <!-- Canlı olay akışı (son 4 olay) -->
-                <div id="hud-feed" class="hud-box-soft px-2.5 py-1.5 flex flex-col gap-1 text-[12px] leading-snug"></div>
+                <!-- Canlı olay akışı (son 3 olay) -->
+                <div id="hud-feed" class="hud-box-soft px-2 py-1 flex flex-col gap-0.5 text-[10.5px] leading-tight"></div>
             </div>
 
             <!-- SAĞ ÜST: HEDİYE SÜTUNU (sohbetin arkasında kalmasın diye yukarıda) -->
@@ -2953,7 +2953,7 @@
 
     function pushFeedItem(user, message) {
         feedItems.unshift({ user, message });
-        if (feedItems.length > 4) feedItems.pop();
+        if (feedItems.length > 3) feedItems.pop();
         const container = document.getElementById('hud-feed');
         container.innerHTML = feedItems.map(item => `
             <div class="truncate">
