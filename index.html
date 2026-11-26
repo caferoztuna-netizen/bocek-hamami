@@ -398,7 +398,7 @@
                     <div class="min-w-0"><div class="gc-coins text-sky-300">5 Jeton</div><div class="gc-label">Köpüklü Kese</div></div>
                 </div>
                 <div class="gift-card">
-                    <div class="gift-icon-wrap" data-gift-slot="dino"></div>
+                    <div class="gift-icon-wrap" data-gift-slot="rosa"></div>
                     <div class="min-w-0"><div class="gc-coins text-emerald-300">10 Jeton</div><div class="gc-label">Disko 15 sn</div></div>
                 </div>
                 <div class="gift-card">
@@ -518,8 +518,8 @@
                         <span class="flex items-center gap-2 font-semibold text-sky-100"><span class="gift-btn-icon" data-gift-slot="nazar"></span>Nazar Boncuğu · Köpüklü Kese</span>
                         <span class="text-[10px] font-bold text-sky-300">5 Jeton</span>
                     </button>
-                    <button onclick="testGift('dino')" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/70 border border-emerald-500/35 text-xs transition">
-                        <span class="flex items-center gap-2 font-semibold text-emerald-100"><span class="gift-btn-icon" data-gift-slot="dino"></span>Küçük Dino · 15sn Disko Topu</span>
+                    <button onclick="testGift('rosa')" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/70 border border-emerald-500/35 text-xs transition">
+                        <span class="flex items-center gap-2 font-semibold text-emerald-100"><span class="gift-btn-icon" data-gift-slot="rosa"></span>Rosa · 15sn Disko Topu</span>
                         <span class="text-[10px] font-bold text-emerald-300">10 Jeton</span>
                     </button>
                     <button onclick="testGift('perfume')" class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-pink-950/60 hover:bg-pink-900/70 border border-pink-500/35 text-xs transition">
@@ -569,7 +569,7 @@
     const GIFT_CONFIG = {
         rose:    { label: 'Gül',           tiktokName: 'Rose',      coins: 1,  file: 'assets/gifts/rose.webp',    cdn: TIKTOK_CDN + 'eba3a9bb85c33e017f3648eaf88d7189~tplv-obj.png', fallback: '🌹' },
         nazar:   { label: 'Nazar Boncuğu', tiktokName: 'Blue Bead', coins: 5,  file: 'assets/gifts/nazar.webp',   cdn: TIKTOK_CDN + '387f4c19014e9424c21b35f0b8890162~tplv-obj.png', fallback: '🧿' },
-        dino:    { label: 'Küçük Dino',    tiktokName: 'Tiny Diny', coins: 10, file: 'assets/gifts/dino.webp',    cdn: TIKTOK_CDN + '3851a489dea62b3a9fe99f61de5470ae~tplv-obj.png', fallback: '🦖' },
+        rosa:    { label: 'Rosa',          tiktokName: 'Rosa',      coins: 10, file: 'assets/gifts/rosa.webp',    cdn: TIKTOK_CDN + 'eb77ead5c3abb6da6034d3cf6cfeb438~tplv-obj.png', fallback: '🌹' },
         perfume: { label: 'Parfüm',        tiktokName: 'Perfume',   coins: 20, file: 'assets/gifts/perfume.webp', cdn: TIKTOK_CDN + '20b8f61246c7b6032777bb81bf4ee055~tplv-obj.png', fallback: '🧴' },
         tea:     { label: 'Çay',           tiktokName: 'Tea',       coins: 50, file: 'assets/gifts/tea.webp',     cdn: TIKTOK_CDN + 'c84fe43f3177684b07ad2f13138a852d~tplv-obj.png', fallback: '🍵' }
     };
@@ -3340,7 +3340,7 @@
     }
 
     const TELLAK_SECONDS_PER_PERFUME = 90;
-    const DISCO_SECONDS_PER_DINO = 15;
+    const DISCO_SECONDS_PER_ROSA = 15;
     const DISCO_MAX_SECONDS = 90;
     const FOAM_SECONDS_PER_NAZAR = 10;
     const FOAM_MAX_SECONDS = 40;
@@ -3388,14 +3388,14 @@
             showGiftToast('nazar', display, `Nazar Boncuğu attı${xN}! Köpüklü kese ${Math.ceil(g.foamTimer)} sn.`);
             focusGuest(g, 'gift');
             pushFeedItem(display, `NAZAR${xN} · Köpüklü kese kazandı`);
-        } else if (giftKey === 'dino') {
+        } else if (giftKey === 'rosa') {
             const wasActive = discoTimeLeft > 0;
-            discoTimeLeft = Math.min(DISCO_MAX_SECONDS, Math.max(0, discoTimeLeft) + DISCO_SECONDS_PER_DINO * count);
+            discoTimeLeft = Math.min(DISCO_MAX_SECONDS, Math.max(0, discoTimeLeft) + DISCO_SECONDS_PER_ROSA * count);
             document.getElementById('disco-banner').classList.remove('hidden');
             document.getElementById('disco-timer').textContent = `${Math.ceil(discoTimeLeft)} sn`;
             if (!wasActive) startDiscoAudio();
-            showGiftToast('dino', display, `Küçük Dino attı${xN}! Hamam Diskosu ${Math.ceil(discoTimeLeft)} sn!`);
-            pushFeedItem(display, `DİNO${xN} · Disko +${DISCO_SECONDS_PER_DINO * count} sn`);
+            showGiftToast('rosa', display, `Rosa attı${xN}! Hamam Diskosu ${Math.ceil(discoTimeLeft)} sn!`);
+            pushFeedItem(display, `ROSA${xN} · Disko +${DISCO_SECONDS_PER_ROSA * count} sn`);
             // Disko: herkesi gösteren geniş açı
             seatGifter(rawName, key, avatarUrl);
             requestFocus('gift', () => setCameraPreset('overview'));
@@ -3461,7 +3461,7 @@
     const GIFT_NAME_ALIASES = {
         rose: ['rose', 'gül', 'gul'],
         nazar: ['blue bead', 'nazar', 'nazar boncuğu', 'nazar boncugu', 'mavi boncuk', 'evil eye'],
-        dino: ['tiny diny', 'küçük dino', 'kucuk dino', 'dino'],
+        rosa: ['rosa'],
         perfume: ['perfume', 'parfüm', 'parfum', 'cologne'],
         tea: ['tea', 'çay', 'cay']
     };
@@ -4285,7 +4285,7 @@
             else if (roll < 0.72) handleIncomingChat(user, 'RENK');
             else if (roll < 0.86) handleGift(user, 'rose');
             else if (roll < 0.92) handleGift(user, 'nazar');
-            else if (roll < 0.95) handleGift(user, 'dino');
+            else if (roll < 0.95) handleGift(user, 'rosa');
             else if (roll < 0.98) handleGift(user, 'perfume');
             else handleGift(user, 'tea');
         }, 2900);
