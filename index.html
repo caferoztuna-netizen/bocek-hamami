@@ -132,8 +132,8 @@
             background: rgba(18, 15, 12, 0.64);
             border: 1px solid rgba(255, 245, 230, 0.24);
             color: #ffffff;
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 700;
             letter-spacing: -0.01em;
             white-space: nowrap;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.68);
@@ -226,6 +226,30 @@
         .invite-pulse {
             animation: invitePulse 2.2s ease-in-out infinite;
         }
+
+        /* Sağ üst hediye kartları: büyük, kolay okunur */
+        .gift-card {
+            display: flex; align-items: center; gap: 7px;
+            padding: 5px 8px 5px 5px; border-radius: 12px;
+            background: rgba(18, 14, 11, 0.48);
+            border: 1px solid rgba(245, 224, 190, 0.24);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+        }
+        .gift-card-gold { background: rgba(120, 72, 10, 0.5); border-color: rgba(253, 224, 71, 0.55); }
+        .gift-card .gift-icon-wrap { width: 34px; height: 34px; }
+        .gift-card .gift-icon-wrap img, .gift-card .gift-icon-wrap svg { width: 32px; height: 32px; }
+        .gc-coins { font-size: 12.5px; font-weight: 800; line-height: 1.1; }
+        .gc-label { font-size: 12px; font-weight: 700; color: #ffffff; line-height: 1.15; white-space: nowrap; }
+
+        /* Ortadaki bildirimler yaylanarak belirir */
+        @keyframes popIn {
+            0% { opacity: 0; transform: translateY(10px) scale(0.86); }
+            60% { opacity: 1; transform: translateY(-2px) scale(1.04); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .pop-in { animation: popIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
         /* Hediye Bildirim Balonu */
         #gift-toast {
@@ -333,112 +357,103 @@
                 Paneli Aç
             </button>
 
-            <!-- SOL ÜST: BÖCEK KAHVESİ TARZI ŞEFFAF KOMUT & DURUM KUTUSU -->
-            <div class="absolute top-2.5 left-2.5 right-2.5 z-20 pointer-events-none flex flex-col gap-1.5">
-
-                <!-- 1. Komut ve Rol Özet Kutusu -->
-                <div class="hud-box px-2.5 py-1.5 text-[11px] leading-[1.42] max-w-[330px]">
-                    <div class="flex items-center justify-between border-b border-white/15 pb-1 mb-1">
-                        <span class="font-bold text-amber-300 tracking-tight">BÖCEK HAMAMI</span>
-                        <span id="hud-occupancy" class="text-[10px] font-semibold text-white bg-black/25 px-1.5 py-0.5 rounded">0 / 30 Kişi</span>
+            <!-- SOL ÜST: DURUM & KOMUT KUTUSU (TikTok'un üst çubuğunun altında başlar) -->
+            <div class="absolute top-[90px] left-2.5 z-20 pointer-events-none flex flex-col gap-1.5 w-[262px]">
+                <div class="hud-box px-3 py-2 leading-snug">
+                    <div class="flex items-center justify-between border-b border-white/15 pb-1 mb-1.5">
+                        <span class="text-[15px] font-extrabold text-amber-300 tracking-tight">BÖCEK HAMAMI</span>
+                        <span id="hud-occupancy" class="text-[13px] font-extrabold text-white bg-black/30 px-2 py-0.5 rounded-md">0/30</span>
                     </div>
-                    <div class="font-bold text-sky-300">Sohbet'e yaz</div>
-                    <div class="text-stone-100 whitespace-nowrap">
-                        <span class="font-bold text-white">OTUR</span> katıl ·
-                        <span class="font-bold text-white">YIKAN</span> su dök ·
-                        <span class="font-bold text-white">RENK</span> peştamal rengini değiştir
+                    <div id="hud-full" class="hidden mb-1.5 px-2 py-1 rounded-lg bg-rose-600/85 text-white text-[12.5px] font-extrabold leading-tight">
+                        Hamam DOLU! Oturmak için en az <span id="hud-min-coins">1</span> jeton
                     </div>
-                    <div class="text-stone-100 flex items-center gap-1.5 mt-0.5">
-                        <span class="text-amber-300 font-semibold">Hamam Ağası:</span>
-                        <span id="hud-aga-name" class="font-bold text-yellow-200 truncate">Boş (Çay · 50 Jeton)</span>
+                    <div class="text-[12.5px] font-extrabold text-sky-300 mb-0.5">Sohbete yaz:</div>
+                    <div class="grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-0.5 text-[13.5px]">
+                        <span class="font-extrabold text-amber-300">OTUR</span><span class="font-semibold text-white">hamama gir</span>
+                        <span class="font-extrabold text-amber-300">YIKAN</span><span class="font-semibold text-white">su dök</span>
+                        <span class="font-extrabold text-amber-300">RENK</span><span class="font-semibold text-white">peştamal rengi</span>
                     </div>
-                    <div class="text-stone-100 flex items-center justify-between gap-1.5 mt-0.5">
-                        <div class="truncate">
-                            <span class="text-pink-300 font-semibold">Tellak:</span>
-                            <span id="hud-tellak-name" class="font-bold text-pink-100">Tellak Hasan</span>
+                    <div class="mt-1.5 pt-1.5 border-t border-white/15 text-[12.5px] space-y-0.5">
+                        <div class="truncate"><span class="text-amber-300 font-extrabold">Ağa:</span> <span id="hud-aga-name" class="font-bold text-yellow-200">Boş</span></div>
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="truncate"><span class="text-pink-300 font-extrabold">Tellak:</span> <span id="hud-tellak-name" class="font-bold text-pink-100">Hasan</span></span>
+                            <span id="hud-tellak-queue" class="text-[11px] font-bold text-white bg-black/30 px-1.5 py-0.5 rounded shrink-0">Sıra: 0</span>
                         </div>
-                        <span id="hud-tellak-queue" class="text-[10px] text-white bg-black/25 px-1.5 py-0.5 rounded shrink-0">Sıra: 0</span>
+                        <div id="hud-spectators" class="hidden text-stone-100"><span class="font-extrabold">İzleyici:</span> <span id="hud-spectator-count" class="font-bold">0</span> kişi sırada</div>
                     </div>
                 </div>
 
-                <!-- 2. Canlı Olay Akışı -->
-                <div id="hud-feed" class="hud-box-soft px-2.5 py-1.5 max-w-[235px] flex flex-col gap-1 text-[10.5px] leading-snug">
-                    <!-- Dinamik son 4 aksiyon -->
+                <!-- Canlı olay akışı (son 4 olay) -->
+                <div id="hud-feed" class="hud-box-soft px-2.5 py-1.5 flex flex-col gap-1 text-[12px] leading-snug"></div>
+            </div>
+
+            <!-- SAĞ ÜST: HEDİYE SÜTUNU (sohbetin arkasında kalmasın diye yukarıda) -->
+            <div class="absolute top-[90px] right-2.5 z-20 pointer-events-none w-[138px] flex flex-col gap-1.5">
+                <div class="gift-card">
+                    <div class="gift-icon-wrap" data-gift-slot="rose"></div>
+                    <div class="min-w-0"><div class="gc-coins text-rose-300">1 Jeton</div><div class="gc-label">Soğuk İçecek</div></div>
+                </div>
+                <div class="gift-card">
+                    <div class="gift-icon-wrap" data-gift-slot="nazar"></div>
+                    <div class="min-w-0"><div class="gc-coins text-sky-300">5 Jeton</div><div class="gc-label">Köpüklü Kese</div></div>
+                </div>
+                <div class="gift-card">
+                    <div class="gift-icon-wrap" data-gift-slot="dino"></div>
+                    <div class="min-w-0"><div class="gc-coins text-emerald-300">10 Jeton</div><div class="gc-label">Disko 15 sn</div></div>
+                </div>
+                <div class="gift-card">
+                    <div class="gift-icon-wrap" data-gift-slot="perfume"></div>
+                    <div class="min-w-0"><div class="gc-coins text-pink-300">20 Jeton</div><div class="gc-label">Tellak Ol</div></div>
+                </div>
+                <div class="gift-card gift-card-gold">
+                    <div class="gift-icon-wrap" data-gift-slot="tea"></div>
+                    <div class="min-w-0"><div class="gc-coins text-yellow-300">50 Jeton</div><div class="gc-label">Hamam Ağası</div></div>
                 </div>
             </div>
 
-            <!-- DİSKO TOPU AKTİF SAYACI -->
-            <div id="disco-banner" class="hidden absolute top-[198px] left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-                <div class="disco-active-pill px-3.5 py-1.5 rounded-full bg-black/75 border-2 text-white text-xs font-extrabold tracking-wide flex items-center gap-2 backdrop-blur-md whitespace-nowrap">
-                    <span class="text-fuchsia-300">HAMAM DİSKOSU</span>
-                    <span id="disco-timer" class="px-2 py-0.5 rounded-full bg-white/15 text-yellow-300 font-mono">15 sn</span>
-                </div>
-            </div>
-
-            <!-- BOŞ HAMAM DAVETİ (hamamda kimse yokken görünür) -->
-            <div id="empty-invite" class="hidden absolute top-[44%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none w-[82%]">
-                <div class="invite-pulse hud-box px-4 py-3 text-center bg-stone-950/55 border-amber-300/50">
-                    <div class="text-[15px] font-extrabold text-amber-300 leading-tight">Hamam seni bekliyor!</div>
-                    <div class="mt-1.5 text-[12px] font-semibold text-white leading-snug">
-                        Sohbet'e <span class="px-1.5 py-0.5 rounded-md bg-amber-500/90 text-stone-950 font-extrabold">OTUR</span> yaz,
-                        <br>ilk hamamböceği sen ol 🛁
+            <!-- ORTA: GEÇİCİ BİLDİRİMLER (disko, hoş geldin, hediye, davet) — sohbet alanının üstünde -->
+            <div id="center-stack" class="absolute top-[372px] left-1/2 -translate-x-1/2 z-30 pointer-events-none w-[92%] flex flex-col items-center gap-2">
+                <div id="disco-banner" class="hidden">
+                    <div class="disco-active-pill px-4 py-1.5 rounded-full bg-black/75 border-2 text-white text-[14px] font-extrabold tracking-wide flex items-center gap-2 backdrop-blur-md whitespace-nowrap">
+                        <span class="text-fuchsia-300">HAMAM DİSKOSU</span>
+                        <span id="disco-timer" class="px-2 py-0.5 rounded-full bg-white/15 text-yellow-300 font-mono">15 sn</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- ANLIK HEDİYE BİLDİRİM BALONU -->
-            <div id="gift-toast" class="opacity-0 -translate-y-2 absolute bottom-[184px] left-1/2 -translate-x-1/2 z-30 pointer-events-none w-[92%]">
-                <div class="hud-box px-3 py-2 flex items-center gap-2.5 bg-stone-950/65 border-amber-300/40">
-                    <div id="gift-toast-icon" class="gift-icon-wrap shrink-0"></div>
-                    <div class="min-w-0">
-                        <div id="gift-toast-user" class="text-xs font-bold text-amber-300 truncate">@kullanici</div>
-                        <div id="gift-toast-msg" class="text-[11px] font-medium text-white truncate">Hediye gönderdi!</div>
+                <div id="gift-toast" class="hidden w-full">
+                    <div class="hud-box px-3 py-2 flex items-center gap-2.5 bg-stone-950/70 border-amber-300/50">
+                        <div id="gift-toast-icon" class="gift-icon-wrap shrink-0"></div>
+                        <div class="min-w-0">
+                            <div id="gift-toast-user" class="text-[14px] font-extrabold text-amber-300 truncate">@kullanici</div>
+                            <div id="gift-toast-msg" class="text-[13px] font-semibold text-white leading-snug">Hediye gönderdi!</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- ALT BÖLGE: ORİJİNAL HEDİYE İKONLARI ŞERİDİ -->
-            <div class="absolute bottom-[96px] left-2.5 right-2.5 z-20 pointer-events-none">
-                <div class="hud-box px-2 py-1.5">
-                    <div class="grid grid-cols-5 gap-1 text-center">
-                        <!-- 1 Jeton: Gül -->
-                        <div class="flex flex-col items-center justify-start px-0.5 py-1 rounded-lg bg-black/15">
-                            <div class="gift-icon-wrap" data-gift-slot="rose"></div>
-                            <span class="text-[9.5px] font-bold text-amber-300 mt-0.5 leading-none">1 Jeton</span>
-                            <span class="text-[9px] font-medium text-stone-100 mt-0.5 leading-tight">Soğuk İçecek</span>
+                <div id="welcome-banner" class="hidden w-full">
+                    <div class="hud-box px-3 py-2 flex items-center gap-2.5 bg-stone-950/65 border-sky-300/50">
+                        <div id="welcome-avatar" class="np-avatar shrink-0" style="width:36px;height:36px;font-size:15px"></div>
+                        <div class="min-w-0">
+                            <div class="text-[14px] font-extrabold text-sky-200 truncate">👋 <span id="welcome-name">@izleyici</span> geldi!</div>
+                            <div id="welcome-msg" class="text-[13px] font-semibold text-white leading-snug">Sohbete OTUR yaz, hamamda yerini kap!</div>
                         </div>
-                        <!-- 5 Jeton: Nazar Boncuğu -->
-                        <div class="flex flex-col items-center justify-start px-0.5 py-1 rounded-lg bg-black/15">
-                            <div class="gift-icon-wrap" data-gift-slot="nazar"></div>
-                            <span class="text-[9.5px] font-bold text-sky-300 mt-0.5 leading-none">5 Jeton</span>
-                            <span class="text-[9px] font-medium text-stone-100 mt-0.5 leading-tight">Köpüklü Kese</span>
-                        </div>
-                        <!-- 10 Jeton: Küçük Dino -->
-                        <div class="flex flex-col items-center justify-start px-0.5 py-1 rounded-lg bg-black/15">
-                            <div class="gift-icon-wrap" data-gift-slot="dino"></div>
-                            <span class="text-[9.5px] font-bold text-emerald-300 mt-0.5 leading-none">10 Jeton</span>
-                            <span class="text-[9px] font-medium text-stone-100 mt-0.5 leading-tight">Disko (15sn)</span>
-                        </div>
-                        <!-- 20 Jeton: Parfüm -->
-                        <div class="flex flex-col items-center justify-start px-0.5 py-1 rounded-lg bg-black/15">
-                            <div class="gift-icon-wrap" data-gift-slot="perfume"></div>
-                            <span class="text-[9.5px] font-bold text-pink-300 mt-0.5 leading-none">20 Jeton</span>
-                            <span class="text-[9px] font-medium text-stone-100 mt-0.5 leading-tight">Tellak Sırası</span>
-                        </div>
-                        <!-- 50 Jeton: Çay -->
-                        <div class="flex flex-col items-center justify-start px-0.5 py-1 rounded-lg bg-amber-500/20 border border-amber-400/35">
-                            <div class="gift-icon-wrap" data-gift-slot="tea"></div>
-                            <span class="text-[9.5px] font-bold text-yellow-300 mt-0.5 leading-none">50 Jeton</span>
-                            <span class="text-[9px] font-medium text-yellow-100 mt-0.5 leading-tight">Hamam Ağası</span>
+                    </div>
+                </div>
+
+                <div id="invite-banner" class="hidden w-[88%]">
+                    <div class="invite-pulse hud-box px-4 py-2.5 text-center bg-stone-950/60 border-amber-300/60">
+                        <div id="invite-title" class="text-[17px] font-extrabold text-amber-300 leading-tight">Hamam seni bekliyor!</div>
+                        <div id="invite-msg" class="mt-1 text-[14px] font-bold text-white leading-snug">
+                            Sohbete <span class="px-1.5 py-0.5 rounded-md bg-amber-500/90 text-stone-950 font-extrabold">OTUR</span> yaz, yerini kap 🛁
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- EN ALT: TİKTOK CANLI YORUM GÜVENLİ BOŞLUĞU -->
+            <!-- EN ALT: TİKTOK CANLI SOHBET ALANI (burada arayüz yok; sadece test modunda işaretli) -->
             <div id="safe-zone" class="absolute bottom-2.5 left-2.5 right-2.5 z-10 pointer-events-none">
-                <div class="h-[78px] rounded-xl border border-dashed border-white/20 bg-black/10 flex items-end justify-center pb-2">
-                    <span class="text-[9.5px] font-medium text-white/55 tracking-wide">TikTok Sohbet & Yorum Alanı (Güvenli Boşluk)</span>
+                <div class="h-[270px] rounded-xl border border-dashed border-white/20 bg-black/10 flex items-end justify-center pb-2">
+                    <span class="text-[10px] font-medium text-white/55 tracking-wide">TikTok Sohbet & Yorum Alanı (Güvenli Boşluk)</span>
                 </div>
             </div>
         </section>
@@ -470,7 +485,7 @@
                 <div class="flex items-center justify-between pt-0.5 text-[10.5px] text-stone-300">
                     <label class="flex items-center gap-1.5 cursor-pointer">
                         <input type="checkbox" id="toggle-autocam-panel" checked onchange="setAutoCam(this.checked)" class="accent-emerald-500 w-3.5 h-3.5 rounded cursor-pointer">
-                        <span>Otomatik bölge & kişi geçişi (7 sn)</span>
+                        <span>Otomatik: hediye &gt; sohbet &gt; geniş açı</span>
                     </label>
                     <button onclick="nextAutoCameraShot()" class="text-[10px] font-bold text-amber-300 hover:text-amber-200">Sonraki Açı &rarr;</button>
                 </div>
@@ -1026,6 +1041,7 @@
     const discoLights = [];
     const discoBeams = [];
     const lanternLights = [];
+    const OVERHEAD = []; // kamera yukarıdan bakınca gizlenen kubbe/ışık parçaları
     const kurnaWaterSurfaces = [];
     const waterStreams = [];
     const steamSprites = [];
@@ -1327,6 +1343,7 @@
             rib.position.y = 6.9;
             rib.rotation.y = theta;
             scene.add(rib);
+            OVERHEAD.push(rib);
         }
 
         // 7. Kubbede yıldız biçimli parlayan fil gözleri (iki halka)
@@ -1347,6 +1364,7 @@
                 hole.position.set(Math.cos(a) * ringR, y, Math.sin(a) * ringR);
                 hole.lookAt(0, 6.9, 0);
                 scene.add(hole);
+                OVERHEAD.push(hole);
             }
         });
     }
@@ -1746,6 +1764,7 @@
         );
         dome.position.y = 6.9;
         scene.add(dome);
+        OVERHEAD.push(dome);
 
         // Kubbe alt kuşağı yalnızca kapalı arka/yan duvarlar boyunca (ön cephe tamamen açık)
         const domeRingGeo = new THREE.TorusGeometry(11.75, 0.22, 8, 24, Math.PI * (4 / 3));
@@ -1754,6 +1773,7 @@
         const domeRing = new THREE.Mesh(domeRingGeo, trimMat);
         domeRing.position.y = 7.52;
         scene.add(domeRing);
+        OVERHEAD.push(domeRing);
 
         const beamMat = new THREE.MeshBasicMaterial({
             color: 0xfff2c6,
@@ -1768,6 +1788,7 @@
             beam.rotation.z = 0.13;
             beam.rotation.x = 0.08;
             scene.add(beam);
+            OVERHEAD.push(beam);
         });
 
         // 5. AKAN SULU MERMER KURNALAR (10 ADET -> 10 KİŞİLİK)
@@ -2966,18 +2987,173 @@
         }
         document.getElementById('gift-toast-user').textContent = '@' + user;
         document.getElementById('gift-toast-msg').textContent = msg;
-        toast.classList.remove('opacity-0', '-translate-y-2');
-        toast.classList.add('opacity-100', 'translate-y-0');
+        popIn(toast);
         clearTimeout(giftToastTimer);
-        giftToastTimer = setTimeout(() => {
-            toast.classList.remove('opacity-100', 'translate-y-0');
-            toast.classList.add('opacity-0', '-translate-y-2');
-        }, 3200);
+        giftToastTimer = setTimeout(() => toast.classList.add('hidden'), 3600);
+    }
+
+    /* =========================================================================
+       HAMAM DOLULUĞU: JETONA GÖRE SIRALAMA
+       Hamam dolunca en çok jeton gönderen 30 kişi oturur, diğerleri izleyici olur.
+       Oturmak için gereken en düşük jeton = en az jetonlu oturanın jetonu + 1.
+       ========================================================================= */
+    const spectators = new Map(); // key -> { display, avatarUrl }
+    const coinsOf = key => wallets.get(key) || 0;
+
+    function lowestSeated() {
+        let low = null;
+        guests.forEach(g => {
+            const c = coinsOf(g.key);
+            if (!low || c < low.c || (c === low.c && g.lastActive < low.g.lastActive)) low = { g, c };
+        });
+        return low;
+    }
+    function hasFreeSeat() { return SEATS.some(s => !s.occupant); }
+    function minCoinsToSit() {
+        if (hasFreeSeat()) return 0;
+        const low = lowestSeated();
+        return low ? low.c + 1 : 0;
+    }
+    function demoteToSpectator(key) {
+        const g = guests.get(key);
+        if (!g) return null;
+        const seat = g.seat;
+        spectators.set(key, { display: g.displayName, avatarUrl: g.avatarUrl || null });
+        removeGuest(key);
+        pushFeedItem(g.displayName, 'Yerini kaptırdı · izleyicilere geçti');
+        return seat;
+    }
+    // Hediye atan kişi hamamda değilse (ve Ağa değilse) jetonu yetiyorsa otursun
+    function seatGifter(rawName, key, avatarUrl) {
+        if (guests.has(key) || (activeAga && activeAga.key === key)) return guests.get(key) || null;
+        return seatGuest(rawName, avatarUrl);
+    }
+
+    /* =========================================================================
+       OLAY ODAKLI KAMERA: hediye > sohbet > geniş açı
+       ========================================================================= */
+    let camFocus = null; // { prio, until, startedAt }
+    const FOCUS_HOLD = { chat: 4.2, gift: 7.0 };
+    const FOCUS_PRIO = { chat: 1, gift: 2 };
+    function requestFocus(kind, apply) {
+        if (!autoCamEnabled || autoCamManualPause > 0 || isDraggingCam) return;
+        const now = clock ? clock.getElapsedTime() : 0;
+        if (camFocus && now < camFocus.until) {
+            if (FOCUS_PRIO[kind] < camFocus.prio) return;                                  // sohbet, hediye odağını bölemez
+            if (FOCUS_PRIO[kind] === camFocus.prio && now - camFocus.startedAt < 1.6) return; // çok sık zıplamasın
+        }
+        apply();
+        camFocus = { prio: FOCUS_PRIO[kind], until: now + FOCUS_HOLD[kind], startedAt: now };
+    }
+    const CLOSEUP_LOOK_Y = 1.45;
+    function closeUpOn(g) {
+        activeFollowGuest = g;
+        activeFollowTellak = false;
+        desiredCam = {
+            preset: 'closeup',
+            // Biraz yukarıdan: önde oturanların başı yakın çekimi kapatmasın
+            yaw: g.seat.rotY + (Math.random() < 0.5 ? 0.32 : -0.32),
+            pitch: 0.5,
+            dist: 4.6,
+            fov: 44,
+            // Bakış noktası başın biraz üstünde: yüz, üstteki yazı kutularının altında kalır (~%58)
+            look: g.seat.pos.clone().add(new THREE.Vector3(0, CLOSEUP_LOOK_Y, 0)),
+            orbitSpeed: Math.random() < 0.5 ? 0.06 : -0.06
+        };
+        updateCameraLabel(`Yakın: @${g.displayName}`);
+    }
+    function focusGuest(g, kind) {
+        if (g && g.seat) requestFocus(kind, () => closeUpOn(g));
+    }
+
+    /* =========================================================================
+       GİRİŞ ÇEKİCİLİĞİ: yeni gelenleri adıyla karşıla + düzenli davet
+       ========================================================================= */
+    const welcomeQueue = [];
+    let welcomeBusyUntil = 0;
+    function handleMemberJoin(rawUser, avatarUrl) {
+        const { key, display } = normalizeUser(rawUser);
+        if (guests.has(key)) return;
+        welcomeQueue.push({ display, avatarUrl });
+        if (welcomeQueue.length > 3) welcomeQueue.splice(0, welcomeQueue.length - 3); // kalabalıkta son gelenler
+    }
+    function popIn(el) {
+        el.classList.remove('hidden', 'pop-in');
+        void el.offsetWidth;
+        el.classList.add('pop-in');
+    }
+    function showNextWelcome(nowMs) {
+        if (nowMs < welcomeBusyUntil || welcomeQueue.length === 0) return;
+        const { display, avatarUrl } = welcomeQueue.shift();
+        const el = document.getElementById('welcome-banner');
+        const av = document.getElementById('welcome-avatar');
+        av.innerHTML = '';
+        av.style.background = hashColor(display);
+        if (avatarUrl) {
+            const img = document.createElement('img');
+            img.referrerPolicy = 'no-referrer';
+            img.src = avatarUrl;
+            img.onerror = () => { av.textContent = display.charAt(0).toUpperCase(); };
+            av.appendChild(img);
+        } else {
+            av.textContent = display.charAt(0).toUpperCase();
+        }
+        document.getElementById('welcome-name').textContent = '@' + display;
+        const need = minCoinsToSit();
+        document.getElementById('welcome-msg').textContent = need > 0
+            ? `Hamam dolu! ${need} jeton gönder, yerini kap 👑`
+            : 'Sohbete OTUR yaz, hamamda yerini kap! 🛁';
+        popIn(el);
+        welcomeBusyUntil = nowMs + 2600;
+        clearTimeout(el._hideTimer);
+        el._hideTimer = setTimeout(() => el.classList.add('hidden'), 2400);
+    }
+
+    // Davet: hamam boşken sürekli, değilse 20 sn'de bir 6 sn görünür
+    let inviteCycle = 0;
+    function updateInvite(dt) {
+        const el = document.getElementById('invite-banner');
+        if (!el) return;
+        const free = SEATS.filter(s => !s.occupant).length;
+        inviteCycle = (inviteCycle + dt) % 20;
+        const show = guests.size === 0 || inviteCycle > 14;
+        const titleEl = document.getElementById('invite-title');
+        const msgEl = document.getElementById('invite-msg');
+        if (show) {
+            if (guests.size === 0) {
+                titleEl.textContent = 'Hamam seni bekliyor!';
+                msgEl.innerHTML = 'Sohbete <span class="px-1.5 py-0.5 rounded-md bg-amber-500/90 text-stone-950 font-extrabold">OTUR</span> yaz, ilk böcek sen ol 🛁';
+            } else if (free > 0) {
+                titleEl.textContent = `Hamamda ${free} boş yer var!`;
+                msgEl.innerHTML = 'Sohbete <span class="px-1.5 py-0.5 rounded-md bg-amber-500/90 text-stone-950 font-extrabold">OTUR</span> yaz, yerini kap 🛁';
+            } else {
+                titleEl.textContent = 'Hamam DOLU! 👑';
+                msgEl.textContent = `En az ${minCoinsToSit()} jeton gönder, birinin yerini kap!`;
+            }
+        }
+        if (show && el.classList.contains('hidden')) popIn(el);
+        if (!show && !el.classList.contains('hidden')) el.classList.add('hidden');
+    }
+
+    // Olay olmadığında hamam canlı görünsün: rastgele bir böcek kısa bir sevinç/el sallama yapar
+    let ambientTimer = 4;
+    function updateAmbient(dt) {
+        ambientTimer -= dt;
+        if (ambientTimer > 0) return;
+        ambientTimer = 3.5 + Math.random() * 3;
+        const list = Array.from(guests.values());
+        if (!list.length) return;
+        const g = list[Math.floor(Math.random() * list.length)];
+        if (g.washTimer <= 0 && g.foamTimer <= 0) g.celebrateTimer = Math.max(g.celebrateTimer, 0.7);
     }
 
     function updateHudStats() {
-        document.getElementById('hud-occupancy').textContent = `${guests.size} / ${SEATS.length} Kişi`;
-        document.getElementById('empty-invite').classList.toggle('hidden', guests.size > 0);
+        document.getElementById('hud-occupancy').textContent = `${guests.size}/${SEATS.length}`;
+        const need = minCoinsToSit();
+        document.getElementById('hud-full').classList.toggle('hidden', need <= 0);
+        document.getElementById('hud-min-coins').textContent = need;
+        document.getElementById('hud-spectators').classList.toggle('hidden', spectators.size === 0);
+        document.getElementById('hud-spectator-count').textContent = spectators.size;
         document.getElementById('hud-aga-name').textContent = activeAga ? `@${activeAga.displayName}` : 'Boş (Çay · 50 Jeton)';
         if (activeTellak) {
             const suffix = activeTellak.isNPC ? '' : ` (${Math.ceil(activeTellak.remainingSec)}sn)`;
@@ -3020,21 +3196,20 @@
         if (freeSeats.length > 0) {
             seat = freeSeats[Math.floor(Math.random() * freeSeats.length)];
         } else {
-            // En eski pasif kişiyi kaldırıp yeni kişiye yer aç
-            let oldestKey = null;
-            let oldestTime = Infinity;
-            guests.forEach((g, k) => {
-                if (g.lastActive < oldestTime) {
-                    oldestTime = g.lastActive;
-                    oldestKey = k;
-                }
-            });
-            if (oldestKey) {
-                seat = guests.get(oldestKey).seat;
-                removeGuest(oldestKey);
+            // Hamam dolu: en az jetonlu oturandan daha çok jetonu varsa onun yerini alır
+            const low = lowestSeated();
+            if (low && coinsOf(key) > low.c) {
+                seat = demoteToSpectator(low.g.key);
+            } else {
+                const wasSpectator = spectators.has(key);
+                spectators.set(key, { display, avatarUrl });
+                if (!wasSpectator) pushFeedItem(display, `Hamam dolu · ${minCoinsToSit()} jeton ile otur`);
+                updateHudStats();
+                return null;
             }
         }
         if (!seat) return null;
+        spectators.delete(key);
 
         const meshObj = createCockroachMesh({ role: 'guest' });
         meshObj.root.position.copy(seat.pos);
@@ -3056,6 +3231,7 @@
             celebrateTimer: 0.75,
             spawnProgress: 0,
             drinkName: null,
+            avatarUrl,
             phase: Math.random() * Math.PI * 2,
             lastActive: Date.now()
         };
@@ -3193,6 +3369,7 @@
             showCharacterBubble(g.np, `Buz gibi ${drink}!`);
             playSfx('drink');
             showGiftToast('rose', display, `Gül gönderdi${xN}! Eline buz gibi ${drink} geldi.`);
+            focusGuest(g, 'gift');
             pushFeedItem(display, `GÜL${xN} · Soğuk ${drink} aldı`);
         } else if (giftKey === 'nazar') {
             let g = guests.get(key) || seatGuest(rawName, avatarUrl);
@@ -3209,6 +3386,7 @@
             showCharacterBubble(g.np, 'Ohhh mis gibi kese!');
             playSfx('scrub');
             showGiftToast('nazar', display, `Nazar Boncuğu attı${xN}! Köpüklü kese ${Math.ceil(g.foamTimer)} sn.`);
+            focusGuest(g, 'gift');
             pushFeedItem(display, `NAZAR${xN} · Köpüklü kese kazandı`);
         } else if (giftKey === 'dino') {
             const wasActive = discoTimeLeft > 0;
@@ -3218,8 +3396,9 @@
             if (!wasActive) startDiscoAudio();
             showGiftToast('dino', display, `Küçük Dino attı${xN}! Hamam Diskosu ${Math.ceil(discoTimeLeft)} sn!`);
             pushFeedItem(display, `DİNO${xN} · Disko +${DISCO_SECONDS_PER_DINO * count} sn`);
-            // Disko başlarken kamerayı genel şova çek
-            if (!wasActive) setCameraPreset('overview', false);
+            // Disko: herkesi gösteren geniş açı
+            seatGifter(rawName, key, avatarUrl);
+            requestFocus('gift', () => setCameraPreset('overview'));
         } else if (giftKey === 'perfume') {
             const seconds = TELLAK_SECONDS_PER_PERFUME * count;
             if (activeTellak && !activeTellak.isNPC && activeTellak.key === key) {
@@ -3238,15 +3417,18 @@
             const where = pos > 0 ? `Tellak sırası: ${pos}` : 'Şu an Tellak';
             showGiftToast('perfume', display, `Parfüm attı${xN}! ${where} (+${seconds} sn).`);
             pushFeedItem(display, `PARFÜM${xN} · ${where}`);
+            seatGifter(rawName, key, avatarUrl);
+            requestFocus('gift', focusTellakShot);
         } else if (giftKey === 'tea') {
             if (activeAga && activeAga.key === key) {
                 // Zaten ağa: tahtı yeniden kurma, sadece kutla
                 showCharacterBubble(activeAga.np, 'Çaylar benden!');
             } else {
+                // Hamamdaki yerini boşaltıp tahta çıkar
+                if (guests.has(key)) removeGuest(key);
                 promoteHamamAgasi(display, key, avatarUrl);
-                setCameraPreset('throne', false);
-                autoCamTimer = 7.5;
             }
+            requestFocus('gift', () => setCameraPreset('throne'));
             playSfx('aga');
             showGiftToast('tea', display, `Çay gönderdi${xN}! HAMAM AĞASI tahtta!`);
             pushFeedItem(display, `ÇAY${xN} · HAMAM AĞASI`);
@@ -3259,11 +3441,12 @@
         const { key, display } = normalizeUser(rawName);
         const total = Math.max(0, Number(coinsEach) || 0) * count;
         addCoins(key, total);
-        const g = guests.get(key) || seatGuest(rawName, avatarUrl);
+        const g = seatGifter(rawName, key, avatarUrl);
         if (g) {
             g.celebrateTimer = 1.2;
             g.lastActive = Date.now();
             showCharacterBubble(g.np, 'Teşekkürler!');
+            focusGuest(g, 'gift');
         }
         const xN = count > 1 ? ` x${count}` : '';
         const name = giftName || 'Hediye';
@@ -3325,6 +3508,12 @@
         else if (text.includes('YIKAN') || text.includes('YIKA')) handleCommandYikan(rawName, avatarUrl);
         else if (text.includes('RENK')) handleCommandRenk(rawName, avatarUrl);
         else if (text.includes('BAKIYE') || text.includes('BAKİYE') || text.includes('CUZDAN')) handleCommandBakiye(rawName);
+        // Sohbete yazan hamamdaysa kamera ona dönsün (hediye odağını bölmez)
+        const g = guests.get(normalizeUser(rawName).key);
+        if (g) {
+            g.lastActive = Date.now();
+            focusGuest(g, 'chat');
+        }
     }
 
     /* =========================================================================
@@ -3352,9 +3541,13 @@
         setAutoCam(!autoCamEnabled);
         if (autoCamEnabled) {
             autoCamManualPause = 0;
-            nextAutoCameraShot();
+            camFocus = null;
+            setCameraPreset('overview');
         }
     }
+
+    // Yarı kuşbakışı geniş açı: dikey ekranda 30 koltuğun hepsi kadrajda, hamamın merkezi ekranın ~%67'sinde
+    const OVERVIEW = { pitch: 1.0, dist: 33, fov: 60, look: new THREE.Vector3(0, 0, -6.6), sway: 0.05 };
 
     function setCameraPreset(preset, isManual = false) {
         activeFollowGuest = null;
@@ -3362,7 +3555,8 @@
         if (isManual) autoCamManualPause = 12.0;
 
         if (preset === 'overview') {
-            desiredCam = { preset: 'overview', yaw: 0.0, pitch: 0.42, dist: 15.6, look: new THREE.Vector3(0, 1.45, -0.8), orbitSpeed: 0.0, swayCenter: 0.0, swayAmp: 0.36, swayFreq: 0.18 };
+            // Geniş açı: 30 koltuğun hepsi kadrajda
+            desiredCam = { preset: 'overview', yaw: 0.0, pitch: OVERVIEW.pitch, dist: OVERVIEW.dist, fov: OVERVIEW.fov, look: OVERVIEW.look.clone(), orbitSpeed: 0.0, swayCenter: 0.0, swayAmp: OVERVIEW.sway, swayFreq: 0.12 };
             updateCameraLabel('Genel Panorama');
         } else if (preset === 'gobek') {
             const randYaw = (Math.random() - 0.5) * 2.2;
@@ -3391,6 +3585,7 @@
     }
 
     function focusRandomPerson(isManual = false) {
+        camFocus = null;
         if (isManual) autoCamManualPause = 12.0;
         const guestList = Array.from(guests.values());
         if (guestList.length === 0) {
@@ -3525,11 +3720,11 @@
         const x = (tempVec3.x * 0.5 + 0.5) * w;
         const y = (-tempVec3.y * 0.5 + 0.5) * h;
 
-        if (x < -45 || x > w + 45 || y < 14 || y > h - 84 || camDistance > 26) {
+        if (x < -45 || x > w + 45 || y < 14 || y > h - 84 || camDistance > 40) {
             npObj.wrap.style.opacity = '0';
         } else {
-            const depthScale = Math.max(0.68, Math.min(1.06, 11.2 / Math.max(4.0, camDistance)));
-            npObj.wrap.style.opacity = camDistance > 20 ? '0.68' : '1';
+            const depthScale = Math.max(0.72, Math.min(1.06, 13 / Math.max(4.0, camDistance)));
+            npObj.wrap.style.opacity = '1';
             npObj.wrap.style.zIndex = String(Math.max(1, Math.round(500 - camDistance * 15)));
             npObj.wrap.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -100%) scale(${depthScale.toFixed(2)})`;
         }
@@ -3690,17 +3885,32 @@
         const dt = Math.min(clock.getDelta(), 0.05);
         const t = clock.getElapsedTime();
 
-        // Otomatik Yönetmen Kamera
+        // Olay odaklı kamera: odak süresi bitince (ya da hiç olay yoksa) geniş açıya dön
         if (autoCamManualPause > 0) autoCamManualPause = Math.max(0, autoCamManualPause - dt);
         if (autoCamEnabled && !isDraggingCam && autoCamManualPause <= 0) {
-            autoCamTimer -= dt;
-            if (autoCamTimer <= 0) nextAutoCameraShot();
+            if (camFocus && t >= camFocus.until) camFocus = null;
+            if (!camFocus && desiredCam.preset !== 'overview') setCameraPreset('overview');
         }
+        if (camera && desiredCam) {
+            const targetFov = desiredCam.fov || 44;
+            if (Math.abs(camera.fov - targetFov) > 0.05) {
+                camera.fov += (targetFov - camera.fov) * Math.min(1, dt * 2.35);
+                camera.updateProjectionMatrix();
+            }
+        }
+        // Yukarıdan bakan geniş açıda kubbe görüntüyü kapatmasın
+        const overhead = camera.position.y > 8.6;
+        if (OVERHEAD.length && OVERHEAD[0].visible === overhead) OVERHEAD.forEach(o => { o.visible = !overhead; });
+        if (discoGroup) discoGroup.visible = !overhead || discoTimeLeft > 0 || discoGroup.position.y < 10;
+        // Giriş çekiciliği & canlılık
+        showNextWelcome(performance.now());
+        updateInvite(dt);
+        updateAmbient(dt);
 
         if (activeFollowTellak && activeTellak && !isDraggingCam) {
             desiredCam.look.copy(activeTellak.meshObj.root.position).add(new THREE.Vector3(0, 1.0, 0));
         } else if (activeFollowGuest && !isDraggingCam) {
-            desiredCam.look.copy(activeFollowGuest.seat.pos).add(new THREE.Vector3(0, 0.95, 0));
+            desiredCam.look.copy(activeFollowGuest.seat.pos).add(new THREE.Vector3(0, CLOSEUP_LOOK_Y, 0));
         }
 
         if (!isDraggingCam) {
@@ -3976,6 +4186,8 @@
                 handleIncomingChat(user, d.comment || d.text || '', avatar);
             } else if (eventType === 'gift' || d.giftName || d.giftId) {
                 handleIncomingGiftEvent(d, user, avatar);
+            } else if (eventType === 'member') {
+                handleMemberJoin(user, avatar);
             }
         } catch (err) {}
     }
@@ -4067,9 +4279,10 @@
             if (!demoEnabled) return;
             const user = SAMPLE_USERS[Math.floor(Math.random() * SAMPLE_USERS.length)];
             const roll = Math.random();
-            if (roll < 0.34) seatGuest(user);
-            else if (roll < 0.56) handleCommandYikan(user);
-            else if (roll < 0.72) handleCommandRenk(user);
+            if (roll < 0.12) handleMemberJoin(user, null);
+            else if (roll < 0.34) handleIncomingChat(user, 'OTUR');
+            else if (roll < 0.56) handleIncomingChat(user, 'YIKAN');
+            else if (roll < 0.72) handleIncomingChat(user, 'RENK');
             else if (roll < 0.86) handleGift(user, 'rose');
             else if (roll < 0.92) handleGift(user, 'nazar');
             else if (roll < 0.95) handleGift(user, 'dino');
