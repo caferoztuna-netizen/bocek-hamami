@@ -238,9 +238,27 @@
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
         }
         .gift-card-gold { background: rgba(120, 72, 10, 0.5); border-color: rgba(253, 224, 71, 0.55); }
-        .gift-card .gift-icon-wrap { width: 34px; height: 34px; }
-        .gift-card .gift-icon-wrap img, .gift-card .gift-icon-wrap svg { width: 32px; height: 32px; }
-        .gc-coins { font-size: 12.5px; font-weight: 800; line-height: 1.1; }
+        /* Hediye ikonu: hamam temalı madalyon (orijinal görsel tonlanır ve eğilir, birebir görünmez) */
+        .gift-medal {
+            position: relative; flex-shrink: 0;
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at 35% 30%, rgba(255, 240, 210, 0.35), rgba(60, 38, 18, 0.78) 72%);
+            border: 1.5px solid rgba(245, 214, 150, 0.75);
+            box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        .gift-medal .gift-icon-wrap { width: 26px; height: 26px; transform: rotate(-12deg); }
+        .gift-medal .gift-icon-wrap img, .gift-medal .gift-icon-wrap svg {
+            width: 26px; height: 26px;
+            filter: sepia(0.45) saturate(1.3) hue-rotate(-12deg) brightness(1.05) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+        }
+        .gift-medal-num {
+            position: absolute; right: -6px; bottom: -4px;
+            min-width: 16px; height: 15px; padding: 0 3px; border-radius: 8px;
+            background: #1c120a; border: 1px solid rgba(245, 214, 150, 0.8);
+            color: #fde68a; font-size: 10px; font-weight: 800; line-height: 13px; text-align: center;
+            text-shadow: none;
+        }
         .gc-label { font-size: 12px; font-weight: 700; color: #ffffff; line-height: 1.15; white-space: nowrap; }
 
         /* Ortadaki bildirimler yaylanarak belirir */
@@ -365,7 +383,7 @@
                         <span id="hud-occupancy" class="text-[11px] font-extrabold text-white bg-black/30 px-1.5 rounded">0/30</span>
                     </div>
                     <div id="hud-full" class="hidden mb-1 px-1.5 py-0.5 rounded-md bg-rose-600/85 text-white text-[10.5px] font-extrabold leading-tight">
-                        DOLU! Oturmak için en az <span id="hud-min-coins">1</span> jeton
+                        HAMAM DOLU!
                     </div>
                     <div class="text-[11px] leading-snug text-white">
                         <span class="font-extrabold text-sky-300">Yaz:</span>
@@ -390,24 +408,24 @@
             <!-- SAĞ ÜST: HEDİYE SÜTUNU (sohbetin arkasında kalmasın diye yukarıda) -->
             <div class="absolute top-[90px] right-2.5 z-20 pointer-events-none w-[138px] flex flex-col gap-1.5">
                 <div class="gift-card">
-                    <div class="gift-icon-wrap" data-gift-slot="rose"></div>
-                    <div class="min-w-0"><div class="gc-coins text-rose-300">1 Jeton</div><div class="gc-label">Soğuk İçecek</div></div>
+                    <div class="gift-medal"><div class="gift-icon-wrap" data-gift-slot="rose"></div><span class="gift-medal-num">1</span></div>
+                    <div class="min-w-0 gc-label">Soğuk İçecek</div>
                 </div>
                 <div class="gift-card">
-                    <div class="gift-icon-wrap" data-gift-slot="nazar"></div>
-                    <div class="min-w-0"><div class="gc-coins text-sky-300">5 Jeton</div><div class="gc-label">Köpüklü Kese</div></div>
+                    <div class="gift-medal"><div class="gift-icon-wrap" data-gift-slot="nazar"></div><span class="gift-medal-num">5</span></div>
+                    <div class="min-w-0 gc-label">Köpüklü Kese</div>
                 </div>
                 <div class="gift-card">
-                    <div class="gift-icon-wrap" data-gift-slot="rosa"></div>
-                    <div class="min-w-0"><div class="gc-coins text-emerald-300">10 Jeton</div><div class="gc-label">Disko 15 sn</div></div>
+                    <div class="gift-medal"><div class="gift-icon-wrap" data-gift-slot="rosa"></div><span class="gift-medal-num">10</span></div>
+                    <div class="min-w-0 gc-label">Disko 15 sn</div>
                 </div>
                 <div class="gift-card">
-                    <div class="gift-icon-wrap" data-gift-slot="perfume"></div>
-                    <div class="min-w-0"><div class="gc-coins text-pink-300">20 Jeton</div><div class="gc-label">Tellak Ol</div></div>
+                    <div class="gift-medal"><div class="gift-icon-wrap" data-gift-slot="perfume"></div><span class="gift-medal-num">20</span></div>
+                    <div class="min-w-0 gc-label">Tellak Ol</div>
                 </div>
                 <div class="gift-card gift-card-gold">
-                    <div class="gift-icon-wrap" data-gift-slot="tea"></div>
-                    <div class="min-w-0"><div class="gc-coins text-yellow-300">50 Jeton</div><div class="gc-label">Hamam Ağası</div></div>
+                    <div class="gift-medal"><div class="gift-icon-wrap" data-gift-slot="tea"></div><span class="gift-medal-num">50</span></div>
+                    <div class="min-w-0 gc-label">Hamam Ağası</div>
                 </div>
             </div>
 
@@ -3101,7 +3119,7 @@
         document.getElementById('welcome-name').textContent = '@' + display;
         const need = minCoinsToSit();
         document.getElementById('welcome-msg').textContent = need > 0
-            ? `Hamam dolu! ${need} jeton gönder, yerini kap 👑`
+            ? 'Hamam şu an dolu, sohbette kal, eğlenceyi kaçırma! 🛁'
             : 'Sohbete OTUR yaz, hamamda yerini kap! 🛁';
         popIn(el);
         welcomeBusyUntil = nowMs + 2600;
@@ -3128,7 +3146,7 @@
                 msgEl.innerHTML = 'Sohbete <span class="px-1.5 py-0.5 rounded-md bg-amber-500/90 text-stone-950 font-extrabold">OTUR</span> yaz, yerini kap 🛁';
             } else {
                 titleEl.textContent = 'Hamam DOLU! 👑';
-                msgEl.textContent = `En az ${minCoinsToSit()} jeton gönder, birinin yerini kap!`;
+                msgEl.textContent = 'Sohbette kal, eğlenceyi kaçırma! 🛁';
             }
         }
         if (show && el.classList.contains('hidden')) popIn(el);
@@ -3151,10 +3169,9 @@
         document.getElementById('hud-occupancy').textContent = `${guests.size}/${SEATS.length}`;
         const need = minCoinsToSit();
         document.getElementById('hud-full').classList.toggle('hidden', need <= 0);
-        document.getElementById('hud-min-coins').textContent = need;
         document.getElementById('hud-spectators').classList.toggle('hidden', spectators.size === 0);
         document.getElementById('hud-spectator-count').textContent = spectators.size;
-        document.getElementById('hud-aga-name').textContent = activeAga ? `@${activeAga.displayName}` : 'Boş (Çay · 50 Jeton)';
+        document.getElementById('hud-aga-name').textContent = activeAga ? `@${activeAga.displayName}` : 'Boş';
         if (activeTellak) {
             const suffix = activeTellak.isNPC ? '' : ` (${Math.ceil(activeTellak.remainingSec)}sn)`;
             document.getElementById('hud-tellak-name').textContent = activeTellak.displayName + suffix;
@@ -3203,7 +3220,7 @@
             } else {
                 const wasSpectator = spectators.has(key);
                 spectators.set(key, { display, avatarUrl });
-                if (!wasSpectator) pushFeedItem(display, `Hamam dolu · ${minCoinsToSit()} jeton ile otur`);
+                if (!wasSpectator) pushFeedItem(display, 'Hamam dolu · izleyici sırasında');
                 updateHudStats();
                 return null;
             }
@@ -3294,8 +3311,8 @@
         const { key, display } = normalizeUser(rawName);
         const bal = wallets.get(key) || 0;
         const g = guests.get(key);
-        if (g) showCharacterBubble(g.np, `Bakiye: ${bal} Jeton`);
-        pushFeedItem(display, `Cüzdan · Toplam ${bal} Jeton`);
+        if (g) showCharacterBubble(g.np, `Hamam puanı: ${bal}`);
+        pushFeedItem(display, `Hamam puanı · ${bal}`);
     }
 
     function promoteNextTellak() {
@@ -3451,8 +3468,8 @@
         const xN = count > 1 ? ` x${count}` : '';
         const name = giftName || 'Hediye';
         playSfx('color');
-        showGiftToast(null, display, `${name}${xN} gönderdi! (+${total} jeton)`, iconUrl);
-        pushFeedItem(display, `${name}${xN} · +${total} jeton`);
+        showGiftToast(null, display, `${name}${xN} gönderdi! Teşekkürler 🛁`, iconUrl);
+        pushFeedItem(display, `${name}${xN} · teşekkürler`);
     }
 
     /* TikFinity'den gelen hediyeyi oyundaki 5 hediyeden birine eşler.
