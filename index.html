@@ -227,39 +227,26 @@
             animation: invitePulse 2.2s ease-in-out infinite;
         }
 
-        /* Sağ üst hediye kartları: büyük, kolay okunur */
-        .gift-card {
-            display: flex; align-items: center; gap: 7px;
-            padding: 5px 8px 5px 5px; border-radius: 12px;
-            background: rgba(18, 14, 11, 0.48);
-            border: 1px solid rgba(245, 224, 190, 0.24);
-            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+        /* Sağ kenar hediye listesi: kutusuz, küçük, sessiz. Sayı ikonun alt yarısını kapatır. */
+        .gift-row {
+            display: flex; align-items: center; justify-content: flex-end; gap: 4px;
+            opacity: 0.82;
         }
-        .gift-card-gold { background: rgba(120, 72, 10, 0.5); border-color: rgba(253, 224, 71, 0.55); }
-        /* Hediye ikonu: hamam temalı madalyon (orijinal görsel tonlanır ve eğilir, birebir görünmez) */
-        .gift-medal {
-            position: relative; flex-shrink: 0;
-            width: 36px; height: 36px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle at 35% 30%, rgba(255, 240, 210, 0.35), rgba(60, 38, 18, 0.78) 72%);
-            border: 1.5px solid rgba(245, 214, 150, 0.75);
-            box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.3);
+        .gift-row .gc-label {
+            font-size: 9.5px; font-weight: 700; color: rgba(255, 255, 255, 0.85); line-height: 1.1;
+            white-space: nowrap; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
         }
-        .gift-medal .gift-icon-wrap { width: 26px; height: 26px; transform: rotate(-12deg); }
-        .gift-medal .gift-icon-wrap img, .gift-medal .gift-icon-wrap svg {
-            width: 26px; height: 26px;
-            filter: sepia(0.45) saturate(1.3) hue-rotate(-12deg) brightness(1.05) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+        .gift-mini { position: relative; flex-shrink: 0; width: 26px; height: 26px; }
+        .gift-mini .gift-icon-wrap { width: 26px; height: 26px; }
+        .gift-mini .gift-icon-wrap img, .gift-mini .gift-icon-wrap svg {
+            width: 24px; height: 24px;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
         }
-        .gift-medal-num {
-            position: absolute; right: -6px; bottom: -4px;
-            min-width: 16px; height: 15px; padding: 0 3px; border-radius: 8px;
-            background: #1c120a; border: 1px solid rgba(245, 214, 150, 0.8);
-            color: #fde68a; font-size: 10px; font-weight: 800; line-height: 13px; text-align: center;
-            text-shadow: none;
+        .gift-mini-num {
+            position: absolute; left: 50%; bottom: -1px; transform: translateX(-50%);
+            font-size: 12px; font-weight: 900; line-height: 1; color: #fde68a;
+            -webkit-text-stroke: 2.5px #1c120a; paint-order: stroke fill;
         }
-        .gc-label { font-size: 12px; font-weight: 700; color: #ffffff; line-height: 1.15; white-space: nowrap; }
 
         /* Ortadaki bildirimler yaylanarak belirir */
         @keyframes popIn {
@@ -405,27 +392,27 @@
                 <div id="hud-feed" class="hud-box-soft px-2 py-1 flex flex-col gap-0.5 text-[10.5px] leading-tight"></div>
             </div>
 
-            <!-- SAĞ ÜST: HEDİYE SÜTUNU (sohbetin arkasında kalmasın diye yukarıda) -->
-            <div class="absolute top-[90px] right-2.5 z-20 pointer-events-none w-[138px] flex flex-col gap-1.5">
-                <div class="gift-card">
-                    <div class="gift-medal"><div class="gift-icon-wrap" data-gift-slot="rose"></div><span class="gift-medal-num">1</span></div>
-                    <div class="min-w-0 gc-label">Soğuk İçecek</div>
+            <!-- SAĞ KENAR: küçük, kutusuz hediye listesi (sayı ikonun üstünde) -->
+            <div class="absolute top-[92px] right-1.5 z-20 pointer-events-none flex flex-col gap-1">
+                <div class="gift-row">
+                    <span class="gc-label">Soğuk İçecek</span>
+                    <div class="gift-mini"><div class="gift-icon-wrap" data-gift-slot="rose"></div><span class="gift-mini-num">1</span></div>
                 </div>
-                <div class="gift-card">
-                    <div class="gift-medal"><div class="gift-icon-wrap" data-gift-slot="nazar"></div><span class="gift-medal-num">5</span></div>
-                    <div class="min-w-0 gc-label">Köpüklü Kese</div>
+                <div class="gift-row">
+                    <span class="gc-label">Köpüklü Kese</span>
+                    <div class="gift-mini"><div class="gift-icon-wrap" data-gift-slot="nazar"></div><span class="gift-mini-num">5</span></div>
                 </div>
-                <div class="gift-card">
-                    <div class="gift-medal"><div class="gift-icon-wrap" data-gift-slot="rosa"></div><span class="gift-medal-num">10</span></div>
-                    <div class="min-w-0 gc-label">Disko 15 sn</div>
+                <div class="gift-row">
+                    <span class="gc-label">Disko 15 sn</span>
+                    <div class="gift-mini"><div class="gift-icon-wrap" data-gift-slot="rosa"></div><span class="gift-mini-num">10</span></div>
                 </div>
-                <div class="gift-card">
-                    <div class="gift-medal"><div class="gift-icon-wrap" data-gift-slot="perfume"></div><span class="gift-medal-num">20</span></div>
-                    <div class="min-w-0 gc-label">Tellak Ol</div>
+                <div class="gift-row">
+                    <span class="gc-label">Tellak Ol</span>
+                    <div class="gift-mini"><div class="gift-icon-wrap" data-gift-slot="perfume"></div><span class="gift-mini-num">20</span></div>
                 </div>
-                <div class="gift-card gift-card-gold">
-                    <div class="gift-medal"><div class="gift-icon-wrap" data-gift-slot="tea"></div><span class="gift-medal-num">50</span></div>
-                    <div class="min-w-0 gc-label">Hamam Ağası</div>
+                <div class="gift-row">
+                    <span class="gc-label">Hamam Ağası</span>
+                    <div class="gift-mini"><div class="gift-icon-wrap" data-gift-slot="tea"></div><span class="gift-mini-num">50</span></div>
                 </div>
             </div>
 
@@ -3066,6 +3053,7 @@
     const CLOSEUP_LOOK_Y = 1.45;
     function closeUpOn(g) {
         activeFollowGuest = g;
+        lastShotGuestKey = g.key; // rotasyon, olayla gösterilen kişiyi hemen tekrar göstermesin
         activeFollowTellak = false;
         desiredCam = {
             preset: 'closeup',
@@ -3648,31 +3636,36 @@
         updateCameraLabel(`Tellak: ${activeTellak.displayName}`);
     }
 
-    const AUTO_CAMERA_PLAN = [
-        () => setCameraPreset('overview'),
-        () => focusRandomPerson(false),
-        () => setCameraPreset('gobek'),
-        () => setCameraPreset('kurna_left'),
-        () => focusRandomPerson(false),
-        () => setCameraPreset('throne'),
-        () => setCameraPreset('lounge_right'),
-        () => focusTellakShot(),
-        () => setCameraPreset('kurna_right'),
-        () => focusRandomPerson(false),
-        () => setCameraPreset('lounge_left'),
-        () => setCameraPreset('front_lounges')
-    ];
+    /* Olay yokken yönetmen: oturanlar arasında sırayla yakın çekim gezer,
+       her OVERVIEW_EVERY çekimde bir geniş açı gösterir. Hamam boşsa geniş açıda kalır. */
+    const PERSON_SHOT_SEC = 6.0;
+    const OVERVIEW_SHOT_SEC = 7.0;
+    const OVERVIEW_EVERY = 4;
+    let lastShotGuestKey = null;
+
+    function nextGuestInRotation() {
+        const list = Array.from(guests.values());
+        if (list.length === 0) return null;
+        const idx = list.findIndex(g => g.key === lastShotGuestKey);
+        return list[(idx + 1) % list.length];
+    }
 
     function nextAutoCameraShot() {
-        autoCamTimer = 7.2;
         // Hamam boşken boş duvarları gezmek yerine genel görünümde kal
         if (guests.size === 0) {
-            // Açılıştaki dönen kamera ayarında kalmasın: hep salınan genel görünüm
+            autoCamTimer = OVERVIEW_SHOT_SEC;
             if (desiredCam.preset !== 'overview') setCameraPreset('overview');
             return;
         }
-        autoCamStepIndex = (autoCamStepIndex + 1) % AUTO_CAMERA_PLAN.length;
-        AUTO_CAMERA_PLAN[autoCamStepIndex]();
+        autoCamStepIndex = (autoCamStepIndex + 1) % OVERVIEW_EVERY;
+        if (autoCamStepIndex === 0) {
+            autoCamTimer = OVERVIEW_SHOT_SEC;
+            setCameraPreset('overview');
+            return;
+        }
+        const g = nextGuestInRotation();
+        autoCamTimer = PERSON_SHOT_SEC;
+        closeUpOn(g);
     }
 
     function updateCameraPosition() {
@@ -3902,11 +3895,19 @@
         const dt = Math.min(clock.getDelta(), 0.05);
         const t = clock.getElapsedTime();
 
-        // Olay odaklı kamera: odak süresi bitince (ya da hiç olay yoksa) geniş açıya dön
+        // Olay odaklı kamera: hediye/sohbet odağı önce gelir; odak bitince yönetmen
+        // oturanlar arasında gezer, ara sıra geniş açı gösterir (hamam boşsa geniş açı)
         if (autoCamManualPause > 0) autoCamManualPause = Math.max(0, autoCamManualPause - dt);
         if (autoCamEnabled && !isDraggingCam && autoCamManualPause <= 0) {
-            if (camFocus && t >= camFocus.until) camFocus = null;
-            if (!camFocus && desiredCam.preset !== 'overview') setCameraPreset('overview');
+            if (camFocus && t >= camFocus.until) { camFocus = null; autoCamTimer = 0; }
+            if (!camFocus) {
+                autoCamTimer -= dt;
+                // Gösterilen kişi hamamdan çıktıysa beklemeden sonrakine geç
+                const lostSubject = desiredCam.preset === 'closeup' && !activeFollowGuest;
+                if (autoCamTimer <= 0 || lostSubject || (guests.size === 0 && desiredCam.preset !== 'overview')) {
+                    nextAutoCameraShot();
+                }
+            }
         }
         if (camera && desiredCam) {
             const targetFov = desiredCam.fov || 44;
